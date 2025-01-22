@@ -22,6 +22,7 @@ const PageLayout = () => {
                 </div>
 
                 <Header />
+
                 <Outlet />
 
                 <div className="cta1-section-area">
