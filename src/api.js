@@ -40,3 +40,18 @@ export async function fetchSingleCategory(slug) {
         throw error;
     }
 }
+
+/**
+ * Fetch a list of places.
+ * Accepts optional query parameters (e.g., { province, district, category, search }).
+ * @param {Object} [queryParams={}] - Optional query params for filtering.
+ * @returns {Promise<Object>} The response data containing the places.
+ */
+export async function fetchPlaces(queryParams = {}) {
+    try {
+        const response = await apiClient.get('/places/', { params: queryParams });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
