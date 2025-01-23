@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import {
     GoogleMap,
     Marker,
@@ -14,8 +14,8 @@ const mapContainerStyle = {
 };
 
 const defaultCenter = {
-    lat: -1.9577,
-    lng: 30.1127,
+    lat: -1.9577, // Kigali's latitude
+    lng: 30.1127,  // Kigali's longitude
 };
 
 const options = {
@@ -29,7 +29,7 @@ const Map = ({ places }) => {
         libraries: ['places'],
     });
 
-    const [selectedPlace, setSelectedPlace] = React.useState(null);
+    const [selectedPlace, setSelectedPlace] = useState(null);
 
     const handleMarkerClick = useCallback((place) => {
         setSelectedPlace(place);
@@ -70,11 +70,12 @@ const Map = ({ places }) => {
                             position={{ lat: place.latitude, lng: place.longitude }}
                             clusterer={clusterer}
                             onClick={() => handleMarkerClick(place)}
-                            label={{
-                                text: place.user_name,
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                            }}
+                            // Removed label to avoid clutter; using InfoWindow instead
+                            // label={{
+                            //     text: place.user_name,
+                            //     fontSize: '12px',
+                            //     fontWeight: 'bold',
+                            // }}
                         />
                     ))
                 }
@@ -85,7 +86,7 @@ const Map = ({ places }) => {
                     position={{ lat: selectedPlace.latitude, lng: selectedPlace.longitude }}
                     onCloseClick={() => setSelectedPlace(null)}
                 >
-                    <div style={{ maxWidth: '200px' }}>
+                    <div style={{ maxWidth: '250px' }}>
                         <h3>{selectedPlace.user_name}</h3>
                         <p>{selectedPlace.address}</p>
                         <img
