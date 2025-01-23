@@ -1,0 +1,24 @@
+.property-inner-section {
+    padding: 40px 0;
+}
+
+.property-mapgrid-area {
+    /* Ensure the listings area scrolls if content is long */
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+@media (max-width: 992px) {
+    .property-inner-section .row {
+        flex-direction: column;
+    }
+
+    .col-lg-6 {
+        width: 100%;
+    }
+
+    .property-mapgrid-area, .col-lg-6 {
+        max-height: none;
+        height: auto;
+    }
+}

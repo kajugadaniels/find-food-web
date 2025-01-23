@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { SearchFilter } from '../components';
+import { Map, SearchFilter } from '../components';
 import { fetchPlaces, fetchCategories } from '../api';
+import './Places.css';
 
 const Places = () => {
     const [places, setPlaces] = useState([]);
@@ -10,6 +11,7 @@ const Places = () => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOption, setSortOption] = useState('newest'); // can be 'newest' or 'oldest'
+    const [locationFilters, setLocationFilters] = useState({});
 
     /**
      * Fetch categories on component mount.
@@ -29,7 +31,7 @@ const Places = () => {
     }, []);
 
     /**
-     * Fetch places whenever selectedCategory, searchTerm, or sortOption changes.
+     * Fetch places whenever selectedCategory, searchTerm, sortOption, or locationFilters change.
      */
     useEffect(() => {
         const getPlaces = async () => {
@@ -42,6 +44,12 @@ const Places = () => {
                 if (searchTerm) {
                     params.search = searchTerm;
                 }
+                // Handle location filters if implemented
+                Object.keys(locationFilters).forEach((key) => {
+                    if (locationFilters[key]) {
+                        params[key] = locationFilters[key];
+                    }
+                });
 
                 const response = await fetchPlaces(params);
                 let fetchedPlaces = response.data || [];
@@ -60,7 +68,7 @@ const Places = () => {
         };
 
         getPlaces();
-    }, [selectedCategory, searchTerm, sortOption]);
+    }, [selectedCategory, searchTerm, sortOption, locationFilters]);
 
     return (
         <>
@@ -90,6 +98,8 @@ const Places = () => {
                     setSearchTerm={setSearchTerm}
                     sortOption={sortOption}
                     setSortOption={setSortOption}
+                    locationFilters={locationFilters}
+                    setLocationFilters={setLocationFilters}
                 />
             </div>
 
@@ -114,6 +124,7 @@ const Places = () => {
                                                     aria-controls="pills-home"
                                                     aria-selected="true"
                                                 >
+                                                    {/* SVG Icon */}
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         viewBox="0 0 24 24"
@@ -134,6 +145,7 @@ const Places = () => {
                                                     aria-controls="pills-profile"
                                                     aria-selected="false"
                                                 >
+                                                    {/* SVG Icon */}
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         viewBox="0 0 24 24"
@@ -170,10 +182,10 @@ const Places = () => {
                                                     <div className="property-boxarea">
                                                         <div className="img1">
                                                             {/* 
-                                Show place.profile_image if available,
-                                otherwise fallback to user_image,
-                                else a placeholder
-                              */}
+                                    Show place.profile_image if available,
+                                    otherwise fallback to user_image,
+                                    else a placeholder
+                                  */}
                                                             <img
                                                                 src={
                                                                     place.profile_image
@@ -234,30 +246,20 @@ const Places = () => {
                                             )}
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
 
                         {/* RIGHT COLUMN: Map */}
-                        <div className="col-lg-6">
-                            <div className="wrap-right">
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.486581183389!2d30.11043537600189!3d-1.9589448367334075!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca77ba24b38d7%3A0x3974687218da665c!2sBURGER%20BROS!5e0!3m2!1sen!2srw!4v1737591304552!5m2!1sen!2srw"
-                                    width="600"
-                                    height="450"
-                                    allowFullScreen
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer-when-downgrade"
-                                    title="Map"
-                                />
-                            </div>
+                        <div className="col-lg-6" style={{ height: '600px', marginTop: '20px' }}>
+                            <Map places={places} />
                         </div>
                     </div>
                 </div>
             </div>
         </>
     );
+
 };
 
 export default Places;

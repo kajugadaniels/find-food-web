@@ -3,7 +3,8 @@ import {
     GoogleMap,
     Marker,
     InfoWindow,
-    useLoadScript
+    useLoadScript,
+    MarkerClusterer
 } from '@react-google-maps/api';
 import PropTypes from 'prop-types';
 
@@ -62,16 +63,23 @@ const Map = ({ places }) => {
             onClick={handleMapClick}
         >
             {places.map((place) => (
-                <Marker
-                    key={place.id}
-                    position={{ lat: place.latitude, lng: place.longitude }}
-                    onClick={() => handleMarkerClick(place)}
-                    label={{
-                        text: place.user_name,
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                    }}
-                />
+                <MarkerClusterer>
+                    {(clusterer) =>
+                        places.map((place) => (
+                            <Marker
+                                key={place.id}
+                                position={{ lat: place.latitude, lng: place.longitude }}
+                                clusterer={clusterer}
+                                onClick={() => handleMarkerClick(place)}
+                                label={{
+                                    text: place.user_name,
+                                    fontSize: '12px',
+                                    fontWeight: 'bold',
+                                }}
+                            />
+                        ))
+                    }
+                </MarkerClusterer>
             ))}
 
             {selectedPlace && (
@@ -79,10 +87,23 @@ const Map = ({ places }) => {
                     position={{ lat: selectedPlace.latitude, lng: selectedPlace.longitude }}
                     onCloseClick={() => setSelectedPlace(null)}
                 >
-                    <div>
+                    <div style={{ maxWidth: '200px' }}>
                         <h3>{selectedPlace.user_name}</h3>
                         <p>{selectedPlace.address}</p>
-                        <a href={`/places/${selectedPlace.user_slug}`}>View Details</a>
+                        <img
+                            src={
+                                selectedPlace.profile_image
+                                    ? selectedPlace.profile_image
+                                    : selectedPlace.user_image
+                                        ? selectedPlace.user_image
+                                        : 'https://via.placeholder.com/150'
+                            }
+                            alt={selectedPlace.user_name}
+                            style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
+                        />
+                        <a href={`/places/${selectedPlace.user_slug}`} className="btn btn-primary">
+                            View Details
+                        </a>
                     </div>
                 </InfoWindow>
             )}
