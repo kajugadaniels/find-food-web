@@ -21,4 +21,8 @@
         max-height: none;
         height: auto;
     }
+
+    .filters {
+        flex-direction: column;
+    }
 }
