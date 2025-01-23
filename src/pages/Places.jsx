@@ -10,7 +10,7 @@ const Places = () => {
     // Filter states
     const [selectedCategory, setSelectedCategory] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortOption, setSortOption] = useState('newest');
+    const [sortOption, setSortOption] = useState('newest'); // can be 'newest' or 'oldest'
     const [locationFilters, setLocationFilters] = useState({});
 
     /**
@@ -53,6 +53,9 @@ const Places = () => {
 
                 const response = await fetchPlaces(params);
                 let fetchedPlaces = response.data || [];
+
+                // Debugging: Log fetched places
+                console.log('Fetched Places:', fetchedPlaces);
 
                 // Client-side sorting by 'created_at' field
                 fetchedPlaces = fetchedPlaces.sort((a, b) => {
@@ -251,15 +254,15 @@ const Places = () => {
                         </div>
 
                         {/* RIGHT COLUMN: Map */}
-                        <div className="col-lg-6" style={{ height: '600px', marginTop: '20px' }}>
+                        <div className="col-lg-6 map-container" style={{ height: '600px', marginTop: '20px' }}>
                             <Map places={places} />
                         </div>
                     </div>
                 </div>
             </div>
         </>
-    );
 
+    );
 };
 
 export default Places;
