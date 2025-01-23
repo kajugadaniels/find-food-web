@@ -26,3 +26,17 @@ export async function fetchCategories(queryParams = {}) {
         throw error;
     }
 }
+
+/**
+ * Fetch a single category by its slug.
+ * @param {string} slug - The slug of the category.
+ * @returns {Promise<Object>} The response data for the given category.
+ */
+export async function fetchSingleCategory(slug) {
+    try {
+        const response = await apiClient.get(`/category/${slug}/`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
