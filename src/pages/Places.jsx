@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { SearchFilter } from '../components';
+import { Map, SearchFilter } from '../components';
 import { fetchPlaces, fetchCategories } from '../api';
-import Map from '../components/Map'; // Updated import
-import './Places.css'; // Ensure this file exists for styling
+import './Places.css';
 
 const Places = () => {
     const [places, setPlaces] = useState([]);
