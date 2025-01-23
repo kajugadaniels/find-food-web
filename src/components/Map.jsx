@@ -1,3 +1,4 @@
+// src/components/Map.jsx
 import React, { useMemo, useCallback } from 'react';
 import {
     GoogleMap,
@@ -25,7 +26,7 @@ const options = {
 
 const Map = ({ places }) => {
     const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
         libraries: ['places'],
     });
 
@@ -62,25 +63,23 @@ const Map = ({ places }) => {
             options={options}
             onClick={handleMapClick}
         >
-            {places.map((place) => (
-                <MarkerClusterer>
-                    {(clusterer) =>
-                        places.map((place) => (
-                            <Marker
-                                key={place.id}
-                                position={{ lat: place.latitude, lng: place.longitude }}
-                                clusterer={clusterer}
-                                onClick={() => handleMarkerClick(place)}
-                                label={{
-                                    text: place.user_name,
-                                    fontSize: '12px',
-                                    fontWeight: 'bold',
-                                }}
-                            />
-                        ))
-                    }
-                </MarkerClusterer>
-            ))}
+            <MarkerClusterer>
+                {(clusterer) =>
+                    places.map((place) => (
+                        <Marker
+                            key={place.id}
+                            position={{ lat: place.latitude, lng: place.longitude }}
+                            clusterer={clusterer}
+                            onClick={() => handleMarkerClick(place)}
+                            label={{
+                                text: place.user_name,
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        />
+                    ))
+                }
+            </MarkerClusterer>
 
             {selectedPlace && (
                 <InfoWindow
@@ -120,8 +119,10 @@ Map.propTypes = {
             longitude: PropTypes.number.isRequired,
             address: PropTypes.string,
             user_slug: PropTypes.string.isRequired,
+            profile_image: PropTypes.string,
+            user_image: PropTypes.string,
         })
     ).isRequired,
 };
 
-export default Map
+export default React.memo(Map);
