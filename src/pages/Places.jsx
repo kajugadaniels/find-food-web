@@ -9,7 +9,7 @@ const Places = () => {
     // Filter states
     const [selectedCategory, setSelectedCategory] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortOption, setSortOption] = useState('newest'); // or 'oldest'
+    const [sortOption, setSortOption] = useState('newest'); // can be 'newest' or 'oldest'
 
     /**
      * Fetch categories on component mount.
@@ -17,8 +17,8 @@ const Places = () => {
     useEffect(() => {
         const getCategories = async () => {
             try {
+                // The response shape is { message: "...", data: [...] }
                 const data = await fetchCategories();
-                // The response likely has shape: { message: "...", data: [...] }
                 setCategories(data.data || []);
             } catch (error) {
                 console.error('Error fetching categories:', error);
@@ -30,14 +30,13 @@ const Places = () => {
 
     /**
      * Fetch places whenever selectedCategory, searchTerm, or sortOption changes.
-     * For demonstration, we apply “sort by” on the front end (after we get data).
      */
     useEffect(() => {
         const getPlaces = async () => {
             try {
                 const params = {};
                 if (selectedCategory) {
-                    // The backend expects 'category' to be a slug
+                    // The backend expects 'category' as the slug
                     params.category = selectedCategory;
                 }
                 if (searchTerm) {
@@ -47,8 +46,7 @@ const Places = () => {
                 const response = await fetchPlaces(params);
                 let fetchedPlaces = response.data || [];
 
-                // Apply sorting on frontend since the backend does not provide a "sort" param.
-                // We'll assume each place has a "created_at" field for demonstration.
+                // Client-side sorting by 'created_at' field
                 fetchedPlaces = fetchedPlaces.sort((a, b) => {
                     const dateA = new Date(a.created_at);
                     const dateB = new Date(b.created_at);
@@ -82,9 +80,8 @@ const Places = () => {
                         </div>
                     </div>
                 </div>
-                {/**
-         * Pass filter-related state and handlers into SearchFilter
-         */}
+
+                {/* Pass filter-related state and handlers to SearchFilter */}
                 <SearchFilter
                     categories={categories}
                     selectedCategory={selectedCategory}
@@ -99,7 +96,7 @@ const Places = () => {
             <div className="property-inner-section sp2">
                 <div className="container">
                     <div className="row">
-                        {/* Left Column: Listing */}
+                        {/* LEFT COLUMN: Listing */}
                         <div className="col-lg-6">
                             <div className="property-mapgrid-area">
                                 <div className="heading1">
@@ -147,16 +144,16 @@ const Places = () => {
                                                 </button>
                                             </li>
                                         </ul>
-                                        {/* Sort in the front-end; we already have a sort dropdown in SearchFilter. */}
                                     </div>
                                 </div>
                                 <div className="space32"></div>
+
                                 <div
                                     className="tab-content"
                                     id="pills-tabContent"
                                     style={{ minHeight: '400px' }}
                                 >
-                                    {/* Grid/List View Tabs */}
+                                    {/* GRID VIEW */}
                                     <div
                                         className="tab-pane fade show active"
                                         id="pills-home"
@@ -168,32 +165,40 @@ const Places = () => {
                                             {places.map((place) => (
                                                 <div
                                                     className="col-lg-6 col-md-6"
-                                                    key={place.id || place.slug}
+                                                    key={place.id || `${place.user_slug}-${place.category_slug}`}
                                                 >
                                                     <div className="property-boxarea">
                                                         <div className="img1">
-                                                            {/* In your model, you have place.profile_image, etc. Adjust as needed */}
+                                                            {/* 
+                                Show place.profile_image if available,
+                                otherwise fallback to user_image,
+                                else a placeholder
+                              */}
                                                             <img
                                                                 src={
                                                                     place.profile_image
                                                                         ? place.profile_image
-                                                                        : 'https://via.placeholder.com/300'
+                                                                        : place.user_image
+                                                                            ? place.user_image
+                                                                            : 'https://via.placeholder.com/300'
                                                                 }
-                                                                alt={place.name || 'Place'}
+                                                                alt={place.user_name || 'Place'}
                                                                 style={{ width: '100%', height: 'auto' }}
                                                             />
                                                         </div>
+
                                                         <div className="category-list">
                                                             <ul>
                                                                 <li>
                                                                     <span>
-                                                                        {place.category?.name || 'No Category'}
+                                                                        {place.category_name || 'No Category'}
                                                                     </span>
                                                                 </li>
                                                             </ul>
                                                         </div>
+
                                                         <div className="content-area">
-                                                            <h5>{place.name || 'N/A'}</h5>
+                                                            <h5>{place.user_name || 'N/A'}</h5>
                                                             <div className="space18"></div>
                                                             <p>{place.address || 'No address provided'}</p>
                                                             <div className="space24"></div>
@@ -234,7 +239,7 @@ const Places = () => {
                             </div>
                         </div>
 
-                        {/* Right Column: Map */}
+                        {/* RIGHT COLUMN: Map */}
                         <div className="col-lg-6">
                             <div className="wrap-right">
                                 <iframe
