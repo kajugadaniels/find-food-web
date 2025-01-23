@@ -261,8 +261,8 @@ const Places = () => {
                 </div>
             </div>
         </>
-
     );
-};
+
+}
 
 export default Places;
