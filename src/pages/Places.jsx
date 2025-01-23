@@ -10,7 +10,7 @@ const Places = () => {
     // Filter states
     const [selectedCategory, setSelectedCategory] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortOption, setSortOption] = useState('newest'); // can be 'newest' or 'oldest'
+    const [sortOption, setSortOption] = useState('newest');
     const [locationFilters, setLocationFilters] = useState({});
 
     /**
@@ -223,7 +223,7 @@ const Places = () => {
                                                                     View Menu
                                                                 </a>
                                                                 <a
-                                                                    href="#"
+                                                                    href="javascript:void(0)"
                                                                     className="heart"
                                                                     style={{ marginLeft: '8px' }}
                                                                 >

@@ -1,4 +1,3 @@
-// src/components/SearchFilter.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';

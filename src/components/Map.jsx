@@ -1,4 +1,3 @@
-// src/components/Map.jsx
 import React, { useMemo, useCallback } from 'react';
 import {
     GoogleMap,
@@ -40,7 +39,7 @@ const Map = ({ places }) => {
         setSelectedPlace(null);
     };
 
-    // Calculate map bounds based on places
+    // Calculate map center based on places
     const center = useMemo(() => {
         if (places.length === 0) return defaultCenter;
 
