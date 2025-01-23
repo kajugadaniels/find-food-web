@@ -55,3 +55,17 @@ export async function fetchPlaces(queryParams = {}) {
         throw error;
     }
 }
+
+/**
+ * Fetch a single place by the slug of its associated user.
+ * @param {string} slug - The user slug that identifies the place.
+ * @returns {Promise<Object>} The response data for the given place.
+ */
+export async function fetchSinglePlace(slug) {
+    try {
+        const response = await apiClient.get(`/place/${slug}/`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
