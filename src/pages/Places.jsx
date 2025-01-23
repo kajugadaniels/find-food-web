@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Map, SearchFilter } from '../components';
+import { SearchFilter } from '../components';
 import { fetchPlaces, fetchCategories } from '../api';
-import './Places.css';
+import Map from '../components/Map'; // Updated import
+import './Places.css'; // Ensure this file exists for styling
 
 const Places = () => {
     const [places, setPlaces] = useState([]);
@@ -182,10 +183,10 @@ const Places = () => {
                                                     <div className="property-boxarea">
                                                         <div className="img1">
                                                             {/* 
-                                    Show place.profile_image if available,
-                                    otherwise fallback to user_image,
-                                    else a placeholder
-                                  */}
+                                                                Show place.profile_image if available,
+                                                                otherwise fallback to user_image,
+                                                                else a placeholder
+                                                            */}
                                                             <img
                                                                 src={
                                                                     place.profile_image
@@ -223,7 +224,7 @@ const Places = () => {
                                                                     View Menu
                                                                 </a>
                                                                 <a
-                                                                    href="javascript:void(0)"
+                                                                    href="#"
                                                                     className="heart"
                                                                     style={{ marginLeft: '8px' }}
                                                                 >
