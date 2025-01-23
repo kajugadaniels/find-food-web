@@ -104,9 +104,6 @@ const SearchFilter = ({
                                     </div>
                                 </div>
                             </div>
-
-                            {/* The rest of your original filters remain here if needed */}
-                            {/* (status, labels, type, advanced forms, etc.) */}
                         </div>
                     </div>
                 </div>
