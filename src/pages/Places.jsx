@@ -1,3 +1,4 @@
+// src/pages/Places.jsx
 import React, { useEffect, useState } from 'react';
 import { Map, SearchFilter } from '../components';
 import { fetchPlaces, fetchCategories } from '../api';
@@ -265,4 +266,4 @@ const Places = () => {
 
 }
 
-export default Places;
+    export default Places;
