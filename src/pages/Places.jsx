@@ -1,4 +1,3 @@
-// src/pages/Places.jsx
 import React, { useEffect, useState } from 'react';
 import { Map, SearchFilter } from '../components';
 import { fetchPlaces, fetchCategories } from '../api';
@@ -14,13 +13,10 @@ const Places = () => {
     const [sortOption, setSortOption] = useState('newest'); // can be 'newest' or 'oldest'
     const [locationFilters, setLocationFilters] = useState({});
 
-    /**
-     * Fetch categories on component mount.
-     */
+    // Fetch categories on component mount
     useEffect(() => {
         const getCategories = async () => {
             try {
-                // The response shape is { message: "...", data: [...] }
                 const data = await fetchCategories();
                 setCategories(data.data || []);
             } catch (error) {
@@ -31,21 +27,18 @@ const Places = () => {
         getCategories();
     }, []);
 
-    /**
-     * Fetch places whenever selectedCategory, searchTerm, sortOption, or locationFilters change.
-     */
+    // Fetch places whenever filters change
     useEffect(() => {
         const getPlaces = async () => {
             try {
                 const params = {};
                 if (selectedCategory) {
-                    // The backend expects 'category' as the slug
                     params.category = selectedCategory;
                 }
                 if (searchTerm) {
                     params.search = searchTerm;
                 }
-                // Handle location filters if implemented
+                // Add location filters if implemented
                 Object.keys(locationFilters).forEach((key) => {
                     if (locationFilters[key]) {
                         params[key] = locationFilters[key];
@@ -185,11 +178,6 @@ const Places = () => {
                                                 >
                                                     <div className="property-boxarea">
                                                         <div className="img1">
-                                                            {/* 
-                                                                Show place.profile_image if available,
-                                                                otherwise fallback to user_image,
-                                                                else a placeholder
-                                                            */}
                                                             <img
                                                                 src={
                                                                     place.profile_image
@@ -266,4 +254,4 @@ const Places = () => {
 
 }
 
-    export default Places;
+export default Places;
