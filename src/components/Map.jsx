@@ -90,8 +90,8 @@ const Map = ({ places }) => {
                 map: googleMapRef.current,
                 title: user_name,
                 icon: {
-                    url: 'https://static-00.iconduck.com/assets.00/map-marker-icon-342x512-gd1hf1rz.png',
-                    scaledSize: new window.google.maps.Size(30, 45), // Adjust the size as needed
+                    url: 'https://png.pngtree.com/png-vector/20221130/ourmid/pngtree-restaurant-location-pin-icon-in-gold-yellow-color-png-image_6485373.png',
+                    scaledSize: new window.google.maps.Size(45, 45),
                 },
             });
 
