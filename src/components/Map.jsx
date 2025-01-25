@@ -13,7 +13,7 @@ const loadGoogleMapsScript = (apiKey) => {
         }
 
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCBxR7pEPbJegF-vGjfsyIhnnleD-nmwYo`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
         script.async = true;
         script.defer = true;
 
@@ -29,16 +29,142 @@ const loadGoogleMapsScript = (apiKey) => {
     });
 };
 
-const Map = ({ places }) => {
-    const mapRef = useRef(null); // Reference to the map container div
-    const googleMapRef = useRef(null); // Reference to the Google Map instance
-    const markersRef = useRef([]); // References to the markers
-    const infoWindowRef = useRef(null); // Reference to a single InfoWindow instance
+// Gray Style Array
+const grayStyle = [
+    {
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#f5f5f5" }
+        ]
+    },
+    {
+        "elementType": "labels.icon",
+        "stylers": [
+            { "visibility": "off" }
+        ]
+    },
+    {
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#616161" }
+        ]
+    },
+    {
+        "elementType": "labels.text.stroke",
+        "stylers": [
+            { "color": "#f5f5f5" }
+        ]
+    },
+    {
+        "featureType": "administrative.land_parcel",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#bdbdbd" }
+        ]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#eeeeee" }
+        ]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#757575" }
+        ]
+    },
+    {
+        "featureType": "poi.park",
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#e5e5e5" }
+        ]
+    },
+    {
+        "featureType": "poi.park",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#9e9e9e" }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#ffffff" }
+        ]
+    },
+    {
+        "featureType": "road.arterial",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#757575" }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#dadada" }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#616161" }
+        ]
+    },
+    {
+        "featureType": "road.local",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#9e9e9e" }
+        ]
+    },
+    {
+        "featureType": "transit.line",
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#e5e5e5" }
+        ]
+    },
+    {
+        "featureType": "transit.station",
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#eeeeee" }
+        ]
+    },
+    {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [
+            { "color": "#c9c9c9" }
+        ]
+    },
+    {
+        "featureType": "water",
+        "elementType": "labels.text.fill",
+        "stylers": [
+            { "color": "#9e9e9e" }
+        ]
+    }
+];
 
-    const [mapLoaded, setMapLoaded] = useState(false); // State to track if the map is loaded
+const Map = ({ places }) => {
+    const mapRef = useRef(null);
+    const googleMapRef = useRef(null);
+    const markersRef = useRef([]);
+    const infoWindowRef = useRef(null);
+
+    const [mapLoaded, setMapLoaded] = useState(false);
 
     useEffect(() => {
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Ensure this is set in your .env file
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
         loadGoogleMapsScript(apiKey)
             .then(() => {
@@ -46,6 +172,7 @@ const Map = ({ places }) => {
                 googleMapRef.current = new window.google.maps.Map(mapRef.current, {
                     center: { lat: -1.9577, lng: 30.1127 }, // Default to Kigali's coordinates
                     zoom: 12,
+                    styles: grayStyle, // Apply the gray style
                 });
 
                 // Initialize a single InfoWindow instance
