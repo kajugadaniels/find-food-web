@@ -1,112 +1,131 @@
-import React, { useMemo, useCallback, useState } from 'react';
-import {
-    GoogleMap,
-    Marker,
-    InfoWindow,
-    useLoadScript,
-    MarkerClusterer
-} from '@react-google-maps/api';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const mapContainerStyle = {
-    width: '100%',
-    height: '100%',
-};
+/**
+ * Helper function to load the Google Maps script
+ * Returns a Promise that resolves when the script is loaded
+ */
+const loadGoogleMapsScript = (apiKey) => {
+    return new Promise((resolve, reject) => {
+        if (window.google && window.google.maps) {
+            resolve();
+            return;
+        }
 
-const defaultCenter = {
-    lat: -1.9577, // Kigali's latitude
-    lng: 30.1127,  // Kigali's longitude
-};
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCBxR7pEPbJegF-vGjfsyIhnnleD-nmwYo`;
+        script.async = true;
+        script.defer = true;
 
-const options = {
-    disableDefaultUI: true,
-    zoomControl: true,
+        script.onload = () => {
+            resolve();
+        };
+
+        script.onerror = (e) => {
+            reject(e);
+        };
+
+        document.head.appendChild(script);
+    });
 };
 
 const Map = ({ places }) => {
-    const { isLoaded, loadError } = useLoadScript({
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-        libraries: ['places'],
-    });
+    const mapRef = useRef(null); // Reference to the map container div
+    const googleMapRef = useRef(null); // Reference to the Google Map instance
+    const markersRef = useRef([]); // References to the markers
+    const infoWindowRef = useRef(null); // Reference to a single InfoWindow instance
 
-    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [mapLoaded, setMapLoaded] = useState(false); // State to track if the map is loaded
 
-    const handleMarkerClick = useCallback((place) => {
-        setSelectedPlace(place);
-    }, []);
+    useEffect(() => {
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Ensure this is set in your .env file
 
-    const handleMapClick = () => {
-        setSelectedPlace(null);
-    };
+        loadGoogleMapsScript(apiKey)
+            .then(() => {
+                // Initialize the map
+                googleMapRef.current = new window.google.maps.Map(mapRef.current, {
+                    center: { lat: -1.9577, lng: 30.1127 }, // Default to Kigali's coordinates
+                    zoom: 12,
+                });
 
-    // Calculate map center based on places
-    const center = useMemo(() => {
-        if (places.length === 0) return defaultCenter;
+                // Initialize a single InfoWindow instance
+                infoWindowRef.current = new window.google.maps.InfoWindow();
 
-        const latSum = places.reduce((sum, place) => sum + place.latitude, 0);
-        const lngSum = places.reduce((sum, place) => sum + place.longitude, 0);
-        return {
-            lat: latSum / places.length,
-            lng: lngSum / places.length,
+                setMapLoaded(true);
+            })
+            .catch((error) => {
+                console.error('Error loading Google Maps script:', error);
+            });
+
+        // Cleanup function to remove markers when component unmounts
+        return () => {
+            markersRef.current.forEach(marker => marker.setMap(null));
+            markersRef.current = [];
         };
-    }, [places]);
+    }, []); // Empty dependency array ensures this runs once on mount
 
-    if (loadError) return <div>Error loading maps</div>;
-    if (!isLoaded) return <div>Loading Maps...</div>;
+    useEffect(() => {
+        if (!mapLoaded || !googleMapRef.current) return;
+
+        // Clear existing markers
+        markersRef.current.forEach(marker => marker.setMap(null));
+        markersRef.current = [];
+
+        // Initialize bounds to fit all markers
+        const bounds = new window.google.maps.LatLngBounds();
+
+        // Add new markers
+        places.forEach(place => {
+            const { latitude, longitude, user_name, address, user_slug, profile_image, user_image } = place;
+
+            if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+                console.warn(`Invalid coordinates for place ID ${place.id}`);
+                return;
+            }
+
+            const position = { lat: latitude, lng: longitude };
+
+            const marker = new window.google.maps.Marker({
+                position,
+                map: googleMapRef.current,
+                title: user_name,
+                icon: {
+                    url: 'https://static-00.iconduck.com/assets.00/map-marker-icon-342x512-gd1hf1rz.png',
+                    scaledSize: new window.google.maps.Size(30, 45), // Adjust the size as needed
+                },
+            });
+
+            // Add click listener to open InfoWindow
+            marker.addListener('click', () => {
+                const contentString = `
+                    <div style="max-width: 250px;">
+                        <h3>${user_name}</h3>
+                        <p>${address}</p>
+                        <img src="${profile_image || user_image || 'https://via.placeholder.com/150'}" alt="${user_name}" style="width: 100%; height: auto; margin-bottom: 10px;" />
+                        <a href="/places/${user_slug}" class="btn btn-primary">View Details</a>
+                    </div>
+                `;
+                infoWindowRef.current.setContent(contentString);
+                infoWindowRef.current.open(googleMapRef.current, marker);
+            });
+
+            markersRef.current.push(marker);
+            bounds.extend(position);
+        });
+
+        // Adjust the map to fit all markers
+        if (places.length > 0) {
+            googleMapRef.current.fitBounds(bounds);
+        }
+
+    }, [places, mapLoaded]);
 
     return (
-        <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            zoom={12}
-            center={center}
-            options={options}
-            onClick={handleMapClick}
-        >
-            <MarkerClusterer>
-                {(clusterer) =>
-                    places.map((place) => (
-                        <Marker
-                            key={place.id}
-                            position={{ lat: place.latitude, lng: place.longitude }}
-                            clusterer={clusterer}
-                            onClick={() => handleMarkerClick(place)}
-                            // Removed label to avoid clutter; using InfoWindow instead
-                            // label={{
-                            //     text: place.user_name,
-                            //     fontSize: '12px',
-                            //     fontWeight: 'bold',
-                            // }}
-                        />
-                    ))
-                }
-            </MarkerClusterer>
-
-            {selectedPlace && (
-                <InfoWindow
-                    position={{ lat: selectedPlace.latitude, lng: selectedPlace.longitude }}
-                    onCloseClick={() => setSelectedPlace(null)}
-                >
-                    <div style={{ maxWidth: '250px' }}>
-                        <h3>{selectedPlace.user_name}</h3>
-                        <p>{selectedPlace.address}</p>
-                        <img
-                            src={
-                                selectedPlace.profile_image
-                                    ? selectedPlace.profile_image
-                                    : selectedPlace.user_image
-                                        ? selectedPlace.user_image
-                                        : 'https://via.placeholder.com/150'
-                            }
-                            alt={selectedPlace.user_name}
-                            style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
-                        />
-                        <a href={`/places/${selectedPlace.user_slug}`} className="btn btn-primary">
-                            View Details
-                        </a>
-                    </div>
-                </InfoWindow>
-            )}
-        </GoogleMap>
+        <div
+            ref={mapRef}
+            style={{ width: '100%', height: '100%' }}
+            id="googleMap"
+        />
     );
 };
 
@@ -125,4 +144,4 @@ Map.propTypes = {
     ).isRequired,
 };
 
-export default React.memo(Map);
+export default Map;
